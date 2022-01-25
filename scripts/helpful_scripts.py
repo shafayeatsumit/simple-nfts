@@ -1,11 +1,11 @@
-from brownie import accounts, network, config, MockLinkToken, VRFCoordinatorMock, Contract
+from brownie import accounts, network, config,LinkToken, VRFCoordinatorMock, Contract
 from web3 import Web3
 
 LOCAL_BLOCKCHAIN_ENVIRONMENTS = ["hardhat", "development", "ganache", "mainnet-fork"]
 OPENSEA_URL = "https://testnets.opensea.io/assets/{}/{}"
 BREED_MAPPING = {0: "PUG", 1: "SHIBA_INU", 2: "ST_BERNARD"}
 
-contract_to_mock = {"link_token": MockLinkToken, "vrf_coordinator": VRFCoordinatorMock}
+contract_to_mock = {"link_token": LinkToken, "vrf_coordinator": VRFCoordinatorMock}
 
 
 def get_breed(breed_number):
@@ -56,7 +56,7 @@ def deploy_mocks():
     print("Deploying mocks...")
     account = get_account()
     print("Deploying Mock LinkToken...")
-    link_token = MockLinkToken.deploy({"from": account})
+    link_token = LinkToken.deploy({"from": account})
     print(f"Link Token deployed to {link_token.address}")
     print("Deploying Mock VRF Coordinator...")
     vrf_coordinator = VRFCoordinatorMock.deploy(link_token.address, {"from": account})
@@ -65,15 +65,13 @@ def deploy_mocks():
 
 
 def fund_with_link(
-    contract_address, account=None, link_token=None, amount=Web3.toWei(0.3, "ether")    
+    contract_address, account=None, link_token=None, amount=Web3.toWei(0.3, "ether")
 ):
     account = account if account else get_account()
-    link_token =  link_token if link_token else get_contract("link_token")
+    link_token = link_token if link_token else get_contract("link_token")
+    print('link_token address',link_token)
     funding_tx = link_token.transfer(contract_address, amount, {"from": account})
     funding_tx.wait(1)
     print(f"Funded {contract_address}")
-    return funding_tx    
-
-
-
+    return funding_tx
 
